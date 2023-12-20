@@ -1,3 +1,4 @@
+# Code from: https://github.com/jadore801120/attention-is-all-you-need-pytorch
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -11,8 +12,8 @@ class ScaledDotProductAttention(nn.Module):
         self.temperature = temperature
         self.dropout = nn.Dropout(attn_dropout)
 
-    def forward(self, q, k, v, mask=None):
-
+    def forward(self, q, k, v, mask=None):   
+        # b x n x lq x dk            b x n x dk x lq 
         attn = torch.matmul(q / self.temperature, k.transpose(2, 3))
 
         if mask is not None:
@@ -260,7 +261,24 @@ class Transformer(nn.Module):
             n_layers=6, n_head=8, d_k=64, d_v=64, dropout=0.1, n_position=200,
             trg_emb_prj_weight_sharing=True, emb_src_trg_weight_sharing=True,
             scale_emb_or_prj='prj'):
-
+        '''
+            n_src_vocab: Size of the source language vocabulary (number of words).
+            n_trg_vocab: Size of the target language vocabulary (number of words).
+            src_pad_idx: Index of the padding token in the source language.
+            trg_pad_idx: Index of the padding token in the target language.
+            d_word_vec: Dimensionality of word embedding vectors, default is 512.
+            d_model: Total dimensionality of the model, default is 512. Typically the dimensionality of Q, K, V vectors in the attention mechanism.
+            d_inner: Dimensionality of the hidden layer in the feedforward neural network, default is 2048.
+            n_layers: Number of encoder and decoder layers, default is 6.
+            n_head: Number of attention heads, default is 8. Number of sub-attention heads in multi-head attention.
+            d_k: Dimensionality of Q and K vectors in the attention mechanism, default is 64.
+            d_v: Dimensionality of V vectors in the attention mechanism, default is 64.
+            dropout: Dropout probability, default is 0.1. Dropout probability used in the model.
+            n_position: Maximum length of positional encoding, default is 200. Used to encode the positional information of each word in the input sequence.
+            trg_emb_prj_weight_sharing: Whether to share weights between the target language's embedding and projection layers, default is True.
+            emb_src_trg_weight_sharing: Whether to share weights between the source and target language word embeddings, default is True.
+            scale_emb_or_prj: Controls the scaling of embedding or projection layer weights, default is 'prj'. Options are 'emb' or 'prj'.
+        '''
         super().__init__()
 
         self.src_pad_idx, self.trg_pad_idx = src_pad_idx, trg_pad_idx
